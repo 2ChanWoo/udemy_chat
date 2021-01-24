@@ -1,19 +1,20 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:udemy_chat/widgets/pickers/user_image_picker.dart';
 
 class AuthForm extends StatefulWidget {
-  AuthForm(
-    this.submitFn,
-    this.isLoading,
-  );
+  AuthForm(this.submitFn,
+      this.isLoading,);
 
   final bool isLoading;
   final void Function(
-    String email,
-    String password,
-    String userName,
-    bool isLogin, //로그인 여부가 아니라, 로그인 모드인지, 회원가입 모드인지임.
-    BuildContext ctx, //  스낵바 때문에 context 받아옴.
-  ) submitFn;
+      String email,
+      String password,
+      String userName,
+      bool isLogin, //로그인 여부가 아니라, 로그인 모드인지, 회원가입 모드인지임.
+      BuildContext ctx, //  스낵바 때문에 context 받아옴.
+      ) submitFn;
 
   @override
   _AuthFormState createState() => _AuthFormState();
@@ -25,10 +26,26 @@ class _AuthFormState extends State<AuthForm> {
   var _userEmail = '';
   var _userName = '';
   var _userPassword = '';
+  File _userImageFile;
+
+  void _pickedImage(File image) {
+    _userImageFile = image;
+  }
 
   void _trySubmit() {
     final isValid = _formKey.currentState.validate();
     FocusScope.of(context).unfocus();
+
+    //아래 if(isValid)문과는 다르게, 회원가입할때만 실행되어야 하는 if문이라 분리.
+    if (_userImageFile == null && !_isLogin) {
+      Scaffold.of(context).showSnackBar(
+          SnackBar(content: Text('Please pick an image'),
+            backgroundColor: Theme
+                .of(context)
+                .errorColor,)
+      );
+      return;
+    }
 
     if (isValid) {
       _formKey.currentState.save();
@@ -55,6 +72,7 @@ class _AuthFormState extends State<AuthForm> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
+                  if (!_isLogin) UserImagePicker(_pickedImage),
                   TextFormField(
                     key: ValueKey('email'),
                     validator: (value) {
@@ -108,7 +126,9 @@ class _AuthFormState extends State<AuthForm> {
                     ),
                   if (!widget.isLoading)
                     FlatButton(
-                      textColor: Theme.of(context).primaryColor,
+                      textColor: Theme
+                          .of(context)
+                          .primaryColor,
                       child: Text(_isLogin
                           ? 'Create new account'
                           : 'I already have an account'),

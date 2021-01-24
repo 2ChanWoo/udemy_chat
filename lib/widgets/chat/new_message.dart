@@ -11,6 +11,7 @@ class _NewMessageState extends State<NewMessage> {
   final _controller = new TextEditingController();
   var _enteredMessage = '';
 
+  //메세지 전송하는 함수. 파베DB에 메세지를 보낸다.
   void _sendMessage() async {
     FocusScope.of(context).unfocus();
     var user = await  FirebaseAuth.instance.currentUser();
