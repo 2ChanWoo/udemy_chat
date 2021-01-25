@@ -1,9 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:udemy_chat/widgets/auth/auth_form.dart';
-
+import 'package:firebase_storage/firebase_storage.dart';
 
 class AuthScreen extends StatefulWidget {
   @override
@@ -14,35 +16,50 @@ class _AuthScreenState extends State<AuthScreen> {
   final _auth = FirebaseAuth.instance;
   var _isLoading = false;
 
-  void _submitAuthForm(   //Future타입이 아닌데 async 가 되네??
-      String email,
-      String password,
-      String username,
-      bool isLogin,   //로그인 여부가 아니라, 로그인 모드인지, 회원가입 모드인지임.
-      BuildContext ctx,   //  스낵바 때문에 context 넘김.
-      ) async {
+  void _submitAuthForm(
+    //Future타입이 아닌데 async 가 되네??
+    String email,
+    String password,
+    String username,
+    File image,
+    bool isLogin, //로그인 여부가 아니라, 로그인 모드인지, 회원가입 모드인지임.
+    BuildContext ctx, //  스낵바 때문에 context 넘김.
+  ) async {
     AuthResult authResult;
 
     try {
       setState(() {
         _isLoading = true;
       });
-      if (isLogin) {    //로그인모드
+      if (isLogin) {
+        //로그인모드
         authResult = await _auth.signInWithEmailAndPassword(
           email: email,
           password: password,
         );
-      } else {    //회원가입 모드
+      } else {
+        //회원가입 모드
         authResult = await _auth.createUserWithEmailAndPassword(
           email: email,
           password: password,
         );
-        await Firestore.instance  //위는 파베 Auth, 요거는 파베 DB~
+
+        final ref = FirebaseStorage.instance
+            .ref()
+            .child('user_image')
+            .child(authResult.user.uid + '.jpg');
+
+        await ref.putFile(image).onComplete;
+
+        final url = await ref.getDownloadURL();
+
+        await Firestore.instance //위는 파베 Auth, 요거는 파베 DB~
             .collection('users')
             .document(authResult.user.uid)
             .setData({
           'username': username,
           'email': email,
+          'image_url' : url,
         });
       }
     } on PlatformException catch (err) {
@@ -66,7 +83,7 @@ class _AuthScreenState extends State<AuthScreen> {
         _isLoading = false;
       });
 //      print('print >>>> ${categorizeErrorCode(err.code)}');
-    //강의 질문에 누가 올린건데 그냥 message도 충분히 설명 잘해주는데, 굳이 이걸 쓸 필요가 있을까 싶다.
+      //강의 질문에 누가 올린건데 그냥 message도 충분히 설명 잘해주는데, 굳이 이걸 쓸 필요가 있을까 싶다.
     }
   }
 
@@ -81,9 +98,10 @@ class _AuthScreenState extends State<AuthScreen> {
     );
   }
 }
+
 //https://www.udemy.com/course/learn-flutter-dart-to-build-ios-android-apps/learn/lecture/19510450#questions/11645808
- // 질문명 : Display different error messages for different Firebase Auth error codes
-  //에서 가져옴. 쓸만해보이길래~
+// 질문명 : Display different error messages for different Firebase Auth error codes
+//에서 가져옴. 쓸만해보이길래~
 String categorizeErrorCode(String errorCode) {
   String errorMessage;
   switch (errorCode) {
@@ -91,8 +109,7 @@ String categorizeErrorCode(String errorCode) {
       errorMessage = "Your email address appears to be malformed.";
       break;
     case "ERROR_INVALID_CREDENTIAL":
-      errorMessage =
-      "Your email address or password appears to be malformed.";
+      errorMessage = "Your email address or password appears to be malformed.";
       break;
     case "ERROR_OPERATION_NOT_ALLOWED":
       errorMessage = "Anonymous accounts are disabled.";
@@ -102,15 +119,15 @@ String categorizeErrorCode(String errorCode) {
       break;
     case "ERROR_USER_DISABLED":
       errorMessage =
-      "Your account has been disabled. Please contact the support.";
+          "Your account has been disabled. Please contact the support.";
       break;
     case "ERROR_USER_NOT_FOUND":
       errorMessage =
-      "Your account does no longer exist. Please contact the support.";
+          "Your account does no longer exist. Please contact the support.";
       break;
     case "ERROR_REQUIRES_RECENT_LOGIN":
       errorMessage =
-      "Changing the password requires a recent sign-in. Please sign out and back in. Then try again.";
+          "Changing the password requires a recent sign-in. Please sign out and back in. Then try again.";
       break;
     case "ERROR_WRONG_PASSWORD":
       errorMessage = "The password is not correct. Please try again.";

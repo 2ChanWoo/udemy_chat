@@ -12,6 +12,7 @@ class AuthForm extends StatefulWidget {
       String email,
       String password,
       String userName,
+      File image,
       bool isLogin, //로그인 여부가 아니라, 로그인 모드인지, 회원가입 모드인지임.
       BuildContext ctx, //  스낵바 때문에 context 받아옴.
       ) submitFn;
@@ -53,6 +54,7 @@ class _AuthFormState extends State<AuthForm> {
         _userEmail.trim(),
         _userPassword.trim(),
         _userName.trim(),
+        _userImageFile,
         _isLogin,
         context,
       );
