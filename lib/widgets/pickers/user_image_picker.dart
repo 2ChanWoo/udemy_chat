@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 
 class UserImagePicker extends StatefulWidget {
   UserImagePicker(this.imagePickFn);
+
   final void Function(File pickedImage) imagePickFn;
 
   @override
@@ -16,7 +17,11 @@ class _UserImagePickerState extends State<UserImagePicker> {
 
   void _pickImage() async {
     final picker = ImagePicker();
-    final pickedImage = await picker.getImage(source: ImageSource.gallery);
+    final pickedImage = await picker.getImage(
+      source: ImageSource.gallery,
+      imageQuality: 50,
+      maxWidth: 50,
+    );
     final pickedImageFile = File(pickedImage.path);
     setState(() {
       _pickedImage = pickedImageFile;
@@ -32,7 +37,8 @@ class _UserImagePickerState extends State<UserImagePicker> {
         CircleAvatar(
           radius: 40,
           backgroundColor: Colors.grey,
-          backgroundImage: _pickedImage != null ? FileImage(_pickedImage) : null,
+          backgroundImage:
+              _pickedImage != null ? FileImage(_pickedImage) : null,
         ),
         FlatButton.icon(
           textColor: Theme.of(context).primaryColor,
