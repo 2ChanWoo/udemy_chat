@@ -14,11 +14,14 @@ class _NewMessageState extends State<NewMessage> {
   //메세지 전송하는 함수. 파베DB에 메세지를 보낸다.
   void _sendMessage() async {
     FocusScope.of(context).unfocus();
-    var user = await  FirebaseAuth.instance.currentUser();
+    var user = await FirebaseAuth.instance.currentUser();
+    final userData =
+        await Firestore.instance.collection('users').document(user.uid).get();
     Firestore.instance.collection('chat').add({
       'text': _enteredMessage,
       'createdAt': Timestamp.now(), // Timestamp : cloud_firestore 함수.
-      'userId' : user.uid,
+      'userId': user.uid,
+      'username': userData['username'],
     });
     _controller.clear();
   }

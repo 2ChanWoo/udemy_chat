@@ -2,10 +2,11 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class MessageBubble extends StatelessWidget {
-  MessageBubble(this.message, this.userId, this.isMe, {this.key});
+  MessageBubble(this.message, this.username, this.isMe, {this.key});
 
   final String message;
-  final String userId;
+  //final String userId;
+  final String username;
   final bool isMe;
   final Key key;
 
@@ -34,24 +35,29 @@ class MessageBubble extends StatelessWidget {
             horizontal: 8,
           ),
           child: Column(
-            crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            crossAxisAlignment:
+                isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
             children: [
-              FutureBuilder(
-                //collection은 Future타입이지만, document는 아니라서, get()을 붙여주어 Future타입으로 만들어 줌.
-                future: Firestore.instance.collection('users').document(userId).get(),
-                builder: (ctx, snapshot) {
-                  if(snapshot.connectionState == ConnectionState.waiting) {
-                    return Text(' ');
-                  }
-                  return Text(snapshot.data['username'],
-                    style: TextStyle(
-                      color: isMe
-                          ? Colors.black
-                          : Theme.of(context).accentTextTheme.title.color,
-                    ),
-                  );
-                },
+              //userId로 닉네임 검색이 Future의 낭비로 여겨, new message에서 닉네임 넘겨주는걸로 변경쓰
+//              FutureBuilder(
+//                //collection은 Future타입이지만, document는 아니라서, get()을 붙여주어 Future타입으로 만들어 줌.
+//                future: Firestore.instance.collection('users').document(userId).get(),
+//                builder: (ctx, snapshot) {
+//                  if(snapshot.connectionState == ConnectionState.waiting) {
+//                    return Text(' ');
+//                  }
+//                  return
+//                    Text(snapshot.data['username'],
+              Text(
+                username,
+                style: TextStyle(
+                  color: isMe
+                      ? Colors.black
+                      : Theme.of(context).accentTextTheme.title.color,
+                ),
               ),
+//                },
+//              ),
               Text(
                 message,
                 style: TextStyle(
@@ -59,7 +65,7 @@ class MessageBubble extends StatelessWidget {
                       ? Colors.black
                       : Theme.of(context).accentTextTheme.title.color,
                 ),
-                textAlign: isMe? TextAlign.end : TextAlign.start,
+                textAlign: isMe ? TextAlign.end : TextAlign.start,
               ),
             ],
           ),
