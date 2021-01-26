@@ -22,6 +22,7 @@ class _NewMessageState extends State<NewMessage> {
       'createdAt': Timestamp.now(), // Timestamp : cloud_firestore 함수.
       'userId': user.uid,
       'username': userData['username'],
+      'userImage' : userData['image_url'],
     });
     _controller.clear();
   }
