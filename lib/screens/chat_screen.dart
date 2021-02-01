@@ -16,6 +16,7 @@ class _ChatScreenState extends State<ChatScreen> {
     // TODO: implement initState
     super.initState();
     final fbm = FirebaseMessaging();
+    fbm.requestNotificationPermissions();
     fbm.configure(
       onMessage: (msg) {
         //앱이 실행중일때 실행됨.
@@ -33,6 +34,8 @@ class _ChatScreenState extends State<ChatScreen> {
         return;
       },
     );
+    //fbm.getToken();
+    fbm.subscribeToTopic("chat");
   }
 
   @override
@@ -42,6 +45,7 @@ class _ChatScreenState extends State<ChatScreen> {
         title: Text('FlutterChat'),
         actions: [
           DropdownButton(
+            underline: Container(),
             icon: Icon(
               Icons.more_vert,
               color: Theme.of(context).primaryIconTheme.color,
