@@ -10,14 +10,23 @@ class NewMessage extends StatefulWidget {
 class _NewMessageState extends State<NewMessage> {
   final _controller = new TextEditingController();
   var _enteredMessage = '';
-
+  int i = 0;
   //메세지 전송하는 함수. 파베DB에 메세지를 보낸다.
   void _sendMessage() async {
     FocusScope.of(context).unfocus();
     var user = await FirebaseAuth.instance.currentUser();
     final userData =
         await Firestore.instance.collection('users').document(user.uid).get();
-    Firestore.instance.collection('chat').add({
+//    Firestore.instance.collection('chat').add({
+//      'text': _enteredMessage,
+//      'createdAt': Timestamp.now(), // Timestamp : cloud_firestore 함수.
+//      'userId': user.uid,
+//      'username': userData['username'],
+//      'userImage' : userData['image_url'],
+//    });
+
+                  //document는 돼도 컬렉션 이름을 원래 없던걸루해서 새로 만드는건 안되넹..
+    Firestore.instance.collection('chat').document('한글').setData({
       'text': _enteredMessage,
       'createdAt': Timestamp.now(), // Timestamp : cloud_firestore 함수.
       'userId': user.uid,

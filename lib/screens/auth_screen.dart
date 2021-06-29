@@ -39,6 +39,7 @@ class _AuthScreenState extends State<AuthScreen> {
         );
       } else {
         //회원가입 모드
+        //없으면 문서ID (authResult.user.uid)를 사로 만드는구나!
         authResult = await _auth.createUserWithEmailAndPassword(
           email: email,
           password: password,
@@ -62,6 +63,7 @@ class _AuthScreenState extends State<AuthScreen> {
           'image_url' : url,
         });
       }
+      print('>>>>>>>>>>>>authResult : ${authResult.user.uid}');
     } on PlatformException catch (err) {
       var message = 'An error occurred, pelase check your credentials!';
 
