@@ -29,6 +29,8 @@ class _AuthFormState extends State<AuthForm> {
   var _userPassword = '';
   File _userImageFile;
 
+  bool _formChanged = false;
+
   void _pickedImage(File image) {
     _userImageFile = image;
   }
@@ -61,6 +63,13 @@ class _AuthFormState extends State<AuthForm> {
     }
   }
 
+  void _FormChanged() {
+    if(_formChanged) return;
+    setState(() {
+      _formChanged = true;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Center(
@@ -71,6 +80,7 @@ class _AuthFormState extends State<AuthForm> {
             padding: EdgeInsets.all(16),
             child: Form(
               key: _formKey,
+              onChanged: _FormChanged,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
@@ -108,6 +118,7 @@ class _AuthFormState extends State<AuthForm> {
                     ),
                   TextFormField(
                     key: ValueKey('password'),
+                    autovalidate: _formChanged,
                     validator: (value) {
                       if (value.isEmpty || value.length < 7) {
                         return 'Password must be at least 7 characters long.';
